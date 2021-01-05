@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB database
 connectDB();
 
+// Init Middleware
+// allows use to get data from req.body
+app.use(express.json({ extended: false }))
+
 
 // ** ROUTES **
 // sends data to the browser, 
