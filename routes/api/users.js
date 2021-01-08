@@ -8,9 +8,12 @@ const router = express.Router();
 const User = require('../../models/User');
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 // this will add validation middleware to review the data a user enters
 const { check, validationResult } = require('express-validator');
 
+// ** Routes **
 // @route    GET api/user
 // @desc     test to confirm api routing is working successfully
 // router.get('/', (req, res) => res.send('User route hit successfully'));
@@ -46,10 +49,12 @@ router.post(
       let user = await User.findOne({ email });
 
       if (user) {
-        return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+        return res
+          .status(400)
+          .json({ errors: [{ msg: 'User already exists' }] });
       }
 
-      // get user's gravatar
+      // get user's gravatar and put in options for the recv'd img
       const avatar = gravatar.url(email, {
         // s is default size of img
         s: '200',
@@ -75,9 +80,22 @@ router.post(
       // save user to db
       await user.save();
 
-      //return the JWT ; we return it so that way the user can be logged in right away
+      //return the JWT of a particular user's id from the db
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
 
-      res.send('User successfully registered');
+      jwt.sign(
+        payload,
+        config.get('jwtSecret'),
+        { expiresIn: 360000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
