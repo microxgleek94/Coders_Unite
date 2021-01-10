@@ -1,8 +1,6 @@
 // *******************
 // this file handles the API routing for creating a user and holding relevant data
 // *******************
-
-// ** Dependencies **
 const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
@@ -13,13 +11,14 @@ const config = require('config');
 // this will add validation middleware to review the data a user enters
 const { check, validationResult } = require('express-validator');
 
+
 // ** Routes **
 // @route    GET api/user
 // @desc     test to confirm api routing is working successfully
-// router.get('/', (req, res) => res.send('User route hit successfully'));
+router.get('/', (req, res) => res.send('User route hit successfully'));
 
 // @route     POST api/users
-// @desc      to register a user data
+// @desc      to register and validate a user's data and save it to db
 router.post(
   '/',
   [
@@ -32,7 +31,7 @@ router.post(
   ],
   async (req, res) => {
     // this will hold the data of the user object and will log in terminal
-    // console.log(`This user was created successfully: ${JSON.stringify(req.body)}`);
+    // console.log(`This user was created successfully: ${JSON.stringify(req.body.name)}`);
 
     const errors = validationResult(req);
 
@@ -48,7 +47,7 @@ router.post(
       // there are not multiple users with the same email
       let user = await User.findOne({ email });
 
-      if (user) {
+      if (!user) {
         return res
           .status(400)
           .json({ errors: [{ msg: 'User already exists' }] });

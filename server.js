@@ -1,4 +1,3 @@
-// Dependencies
 const express = require('express');
 const connectDB = require('./config/db');
 
@@ -14,7 +13,6 @@ connectDB();
 // allows us to get data from req.body
 app.use(express.json({ extended: false }));
 
-// ** ROUTES **
 // sends data to the browser,
 // and when hitting /, i.e http://localhost:5000, it will display the below msg
 app.get('/', (req, res) => res.send('API Running'));
